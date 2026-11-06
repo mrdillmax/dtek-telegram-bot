@@ -1,0 +1,8 @@
+node_modules/
+.env
+artifacts/
+state/
+*.png
+.DS_Store
+AGENT.md
+SKILLS.md

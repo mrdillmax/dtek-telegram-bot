@@ -1,0 +1,61 @@
+name: DTEK Schedule Checker
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: dtek-checker
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check DTEK HTTP access
+        id: dtek_http
+        continue-on-error: true
+        run: node scripts/checkHttp.mjs
+
+      - name: Install Playwright Chromium (only if HTTP is blocked)
+        if: steps.dtek_http.outcome == 'failure'
+        run: npx playwright install --with-deps chromium
+
+      - name: Restore state
+        uses: actions/cache/restore@v4
+        with:
+          path: state/
+          key: dtek-state-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            dtek-state-
+
+      - name: Run checker
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TARGETS: ${{ secrets.TARGETS }}
+          DTEK_BROWSER_FALLBACK: ${{ steps.dtek_http.outcome == 'failure' && 'true' || 'false' }}
+        run: npm start
+
+      - name: Save state
+        if: always()
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: state/
+          key: dtek-state-${{ github.run_id }}-${{ github.run_attempt }}

@@ -1,0 +1,32 @@
+{
+  "name": "dtek-telegram-bot",
+  "version": "1.0.0",
+  "description": "DTEK KREM shutdowns monitoring bot with SVG-to-PNG cards and Telegram Topics support",
+  "type": "module",
+  "main": "./src/index.js",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env ./src/index.js",
+    "dev": "node --env-file-if-exists=.env --watch ./src/index.js",
+    "chat-id": "node --env-file-if-exists=.env ./src/getChatId.js",
+    "check-http": "node --env-file-if-exists=.env ./scripts/checkHttp.mjs"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "impit": "^0.14.8",
+    "playwright": "^1.49.0"
+  },
+  "engines": {
+    "node": ">=22.9.0"
+  },
+  "keywords": [
+    "dtek",
+    "telegram",
+    "bot",
+    "shutdowns",
+    "schedule",
+    "resvg",
+    "impit"
+  ],
+  "author": "",
+  "license": "MIT"
+}
