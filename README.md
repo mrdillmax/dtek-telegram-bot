@@ -55,15 +55,24 @@ npm install
 npm start
 ```
 
-### GitHub Actions (Рекомендовано)
+### GitHub Actions та стабільний розклад через cron-job.org (Рекомендовано)
 
-Бот може працювати повністю автоматично у хмарі кожні 30 хвилин:
+Бот може працювати повністю автоматично у хмарі кожні 30 хвилин. Через особливості безкоштовних репозиторіїв GitHub стандартний cron може затримуватися або зупинятися після 60 днів неактивності. Для **100% стабільного запуску кожні 30 хвилин без затримок** налаштуйте зовнішній пінг через безкоштовний сервіс [cron-job.org](https://cron-job.org/):
 
-1. Додайте секрети репозиторію (`Settings → Secrets and variables → Actions`):
+1. **Додайте секрети репозиторію** (`Settings → Secrets and variables → Actions`):
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_CHAT_ID`
    - `TARGETS`
-2. Workflow `.github/workflows/checker.yml` почне перевірку за розкладом.
+2. **Створіть особистий токен доступу (PAT)** у GitHub (`Settings → Developer settings → Personal access tokens → Fine-grained tokens`) з правами на запуск Actions (`actions:write`).
+3. **Налаштуйте завдання на cron-job.org**:
+   - **URL:** `https://api.github.com/repos/ВАШ_USERNAME/dtek-telegram-bot/actions/workflows/checker.yml/dispatches`
+   - **Execution schedule:** Кожні 30 хвилин (Every 30 minutes)
+   - **Request method:** `POST`
+   - **Request Body:** `{"ref":"main"}`
+   - **Headers:**
+     - `Authorization`: `Bearer ВАШ_ТОКЕН_GITHUB`
+     - `Accept`: `application/vnd.github.v3+json`
+     - `User-Agent`: `cronjob`
 
 ---
 

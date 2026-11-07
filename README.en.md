@@ -55,15 +55,24 @@ npm install
 npm start
 ```
 
-### GitHub Actions (Recommended)
+### GitHub Actions & stable cron via cron-job.org (Recommended)
 
-Runs automatically every 30 minutes in the cloud:
+Bot can run fully automatically every 30 minutes. Due to GitHub Actions free/public repository limitations, the cron can delay or pause after 60 days of inactivity. For **100% stable run every 30 minutes without delay** set up an external pinger via free [cron-job.org](https://cron-job.org/):
 
-1. Add repository secrets (`Settings → Secrets and variables → Actions`):
+1. **Add repository secrets** (`Settings → Secrets and variables → Actions`):
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_CHAT_ID`
    - `TARGETS`
-2. Workflow `.github/workflows/checker.yml` will run on schedule.
+2. **Create a personal access token (PAT)** in GitHub (`Settings → Developer settings → Personal access tokens → Fine-grained tokens`) with permission to run Actions (`actions:write`).
+3. **Set up the task on cron-job.org**:
+   - **URL:** `https://api.github.com/repos/your-username/dtek-telegram-bot/actions/workflows/checker.yml/dispatches`
+   - **Execution schedule:** Every 30 minutes (or as desired)
+   - **Request method:** `POST`
+   - **Request Body:** `{"ref":"main"}`
+   - **Headers:**
+     - `Authorization`: `Bearer YOUR_GITHUB_PAT`
+     - `Accept`: `application/vnd.github.v3+json`
+     - `User-Agent`: `cronjob`
 
 ---
 
